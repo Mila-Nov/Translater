@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'dart:async';
 void main() {
   runApp(const CatTranslatorApp());
 }
@@ -25,14 +25,59 @@ class _CatTranslatorScreen extends State<CatTranslatorScreen>
   
   String StatusText='Нажми кнопку записи';
   String Translate='Перевод здесь';
-  
+  // Timer? означает: здесь может лежать таймер,
+// а может быть null, если таймер еще не создан.
+Timer? timer;
+
+// isAnalyzing показывает, идет ли сейчас анализ.
+// false - анализ не идет.
+// true - анализ идет.
+bool isAnalyzing = false;
+
+// progress - прогресс анализа.
+// 0 означает 0%, 1 означает 100%.
+double progress = 0;
   void startRecording(){
     setState((){
       StatusText='Слушаю';
    Translate='Анализирую'; 
+       isAnalyzing = true;
+      progress = 0;
     });
-  }
   
+  // Timer.periodic запускает код снова и снова.
+  // Здесь код будет запускаться каждые 200 миллисекунд.
+  timer = Timer.periodic(const Duration(milliseconds: 200), (Timer timer) {
+    // Каждый "тик" таймера обновляет экран.
+    setState(() {
+      // Увеличиваем прогресс на 0.05.
+      // Если было 0.20, станет 0.25.
+      progress = progress + 0.05;
+    });
+
+    // Проверяем: дошел ли прогресс до конца.
+    if (progress >= 1) {
+      // Останавливаем таймер, чтобы он не работал бесконечно.
+      timer.cancel();
+
+      // Финальное обновление экрана.
+      setState(() {
+        // Анализ закончился.
+        isAnalyzing = false;
+
+        // Фиксируем прогресс на 100%.
+        progress = 1;
+
+        // Показываем финальный статус.
+        StatusText = 'Перевод готов';
+
+        // Пока перевод простой. На следующих занятиях
+        // мы заменим его на более умный случайный результат.
+        Translate = 'Я требую вкусняшку.';
+      });
+    }
+  });
+}
   
     @override
   Widget build(BuildContext context) {
@@ -77,7 +122,7 @@ class _CatTranslatorScreen extends State<CatTranslatorScreen>
                       ),
                     ],
                   ),
-                  child: const Column(
+                  child:  Column(
                     children: [
                       Text(
                         '🐱',
@@ -85,7 +130,7 @@ class _CatTranslatorScreen extends State<CatTranslatorScreen>
                       ),
                       SizedBox(height: 12),
                       Text(
-                        'Нажми кнопку записи',
+                        StatusText,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -100,7 +145,7 @@ class _CatTranslatorScreen extends State<CatTranslatorScreen>
                   width: double.infinity,
                   height: 54,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: startRecording,
                     child: const Text('Записать мяу'),
                   ),
                 ),
@@ -113,7 +158,7 @@ class _CatTranslatorScreen extends State<CatTranslatorScreen>
                     color: const Color(0xFF202124),
                     borderRadius: BorderRadius.circular(18),
                   ),
-                  child: const Column(
+                  child:  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -125,7 +170,7 @@ class _CatTranslatorScreen extends State<CatTranslatorScreen>
                       ),
                       SizedBox(height: 10),
                       Text(
-                        'Перевод появится здесь',
+                        Translate,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 24,
