@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:math';
 void main() {
   runApp(const CatTranslatorApp());
 }
@@ -28,7 +29,16 @@ class _CatTranslatorScreen extends State<CatTranslatorScreen>
   // Timer? означает: здесь может лежать таймер,
 // а может быть null, если таймер еще не создан.
 Timer? timer;
+// Создаем генератор случайных чисел.
+// Он будет помогать делать волну живой и непредсказуемой.
+final Random random = Random();
 
+// wave - список высот столбиков звуковой волны.
+// List<double> значит: список чисел с дробной частью.
+// List.generate создает список автоматически.
+// 18 - количество столбиков.
+// (index) => 20 значит: каждый столбик сначала высотой 20.
+List<double> wave = List.generate(18, (index) => 20);
 // isAnalyzing показывает, идет ли сейчас анализ.
 // false - анализ не идет.
 // true - анализ идет.
@@ -52,9 +62,17 @@ double progress = 0;
     setState(() {
       // Увеличиваем прогресс на 0.05.
       // Если было 0.20, станет 0.25.
-      progress = progress + 0.05;
+      progress = progress + 0.05;// Пересоздаем список высот для волны.
+  // Каждый раз получаются новые случайные высоты,
+  // поэтому столбики будто двигаются.
+  wave = List.generate(22, (index) {
+    // random.nextInt(70) дает случайное целое число от 0 до 69.
+    // 12 + ... нужно, чтобы столбик никогда не был совсем нулевым.
+    // toDouble() превращает целое число в double,
+    // потому что высота AnimatedContainer ожидает double.
+    return 12 + random.nextInt(70).toDouble();
     });
-
+});
     // Проверяем: дошел ли прогресс до конца.
     if (progress >= 1) {
       // Останавливаем таймер, чтобы он не работал бесконечно.
@@ -128,6 +146,52 @@ double progress = 0;
                         '🐱',
                         style: TextStyle(fontSize: 76),
                       ),
+                      SizedBox(
+  height: 86,
+
+  // Row ставит столбики в ряд слева направо.
+  child: Row(
+    // Центрируем волну по горизонтали.
+    mainAxisAlignment: MainAxisAlignment.center,
+
+    // Центрируем столбики по вертикали внутри области высотой 86.
+    crossAxisAlignment: CrossAxisAlignment.center,
+
+    // wave.map берет каждую высоту из списка wave
+    // и превращает ее в AnimatedContainer.
+    children: wave.map((height) {
+      // Один столбик звуковой волны.
+      return AnimatedContainer(
+        // Длительность анимации изменения высоты.
+        // Благодаря этому столбик меняется плавно, а не резко.
+        duration: const Duration(milliseconds: 160),
+
+        // Ширина одного столбика.
+        width: 7,
+
+        // Высота столбика приходит из списка wave.
+        height: height,
+
+        // Отступы слева и справа между столбиками.
+        margin: const EdgeInsets.symmetric(horizontal: 3),
+
+        // Внешний вид столбика.
+        decoration: BoxDecoration(
+          // Если идет анализ, волна синяя.
+          // Если анализ не идет, волна фиолетовая.
+          color: isAnalyzing
+              ? const Color(0xFF5B8CFF)
+              : const Color(0xFF7A5CFF),
+
+          // Скругляем столбики, чтобы они были похожи на аудио-волну.
+          borderRadius: BorderRadius.circular(20),
+        ),
+      );
+    // map возвращает Iterable, а Row нужны children в виде List.
+    // Поэтому в конце пишем .toList().
+    }).toList(),
+  ),
+),
                       SizedBox(height: 12),
                       Text(
                         StatusText,
@@ -137,6 +201,11 @@ double progress = 0;
                         ),
                         textAlign: TextAlign.center,
                       ),
+                      LinearProgressIndicator (
+                      value:progress,
+                        minHeight:8,
+                        borderRadius:BorderRadius.circular(20)
+                      )
                     ],
                   ),
                 ),
