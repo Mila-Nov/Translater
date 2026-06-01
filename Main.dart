@@ -32,7 +32,47 @@ Timer? timer;
 // Создаем генератор случайных чисел.
 // Он будет помогать делать волну живой и непредсказуемой.
 final Random random = Random();
+// detectedMood - настроение, которое "нашел ИИ".
+// Сначала настроение неизвестно, потому что анализ еще не запускали.
+String detectedMood = 'неизвестно';
 
+// detectedTone - тон кошачьего звука.
+// Например: низкий, средний, высокий.
+String detectedTone = 'неизвестно';
+
+// detectedVolume - громкость звука.
+// Например: тихий, обычный, громкий.
+String detectedVolume = 'неизвестно';
+
+// confidence - уверенность "ИИ" в процентах.
+// int значит целое число.
+int confidence = 0;
+  List<String> moods = ['сонная','голодная','игривая','сердитая'];
+  List<String> tones = ['тёплый','дружелюбный','холодный'];
+  List<String> volumes = ['громкий','тихий','обычный'];
+  Map<String,List<String>> translationsByMood = {
+    'сонная': [
+    'Не трогай меня, я почти сплю.',
+    'Я проснулась только чтобы напомнить, что я главная.',
+    'Сделай потише, у меня важный сон.',
+  ],
+'голодная': [
+    'Моя миска выглядит подозрительно пустой.',
+    'Человек, пора открыть пакетик с кормом.',
+    'Я не драматизирую. Я действительно голодная.',
+  ],
+
+  'игривая': [
+    'Давай играть прямо сейчас.',
+    'Я спрятала энергию в лапах.',
+    'Беги за игрушкой, человек.',
+  ],
+ 'сердитая': [
+    'Я сейчас не в настроении для переговоров.',
+    'Отойди на безопасное расстояние.',
+    'Это моя территория. И диван тоже мой.',
+  ],
+  };
 // wave - список высот столбиков звуковой волны.
 // List<double> значит: список чисел с дробной частью.
 // List.generate создает список автоматически.
@@ -77,26 +117,60 @@ double progress = 0;
     if (progress >= 1) {
       // Останавливаем таймер, чтобы он не работал бесконечно.
       timer.cancel();
-
-      // Финальное обновление экрана.
-      setState(() {
-        // Анализ закончился.
-        isAnalyzing = false;
-
-        // Фиксируем прогресс на 100%.
-        progress = 1;
-
-        // Показываем финальный статус.
-        StatusText = 'Перевод готов';
-
-        // Пока перевод простой. На следующих занятиях
-        // мы заменим его на более умный случайный результат.
-        Translate = 'Я требую вкусняшку.';
-      });
+finishAnalysis();
     }
   });
 }
-  
+  // finishAnalysis запускается, когда прогресс дошел до конца.
+// Эта функция делает финальный "AI-результат".
+void finishAnalysis() {
+  // Выбираем случайное настроение из списка moods.
+  final String mood = moods[random.nextInt(moods.length)];
+
+  // Выбираем случайный тон из списка tones.
+  final String tone = tones[random.nextInt(tones.length)];
+
+  // Выбираем случайную громкость из списка volumes.
+  final String volume = volumes[random.nextInt(volumes.length)];
+
+  // Берем список переводов, подходящий под выбранное настроение.
+  // Например, если mood = 'голодная',
+  // то possibleTranslations будет списком голодных переводов.
+  final List<String> possibleTranslations = translationsByMood[mood]!;
+
+  // Выбираем один случайный перевод из подходящего списка.
+  final String finalTranslation =
+      possibleTranslations[random.nextInt(possibleTranslations.length)];
+
+  // Обновляем экран финальными результатами анализа.
+  setState(() {
+    // Анализ больше не идет.
+    isAnalyzing = false;
+
+    // Прогресс полный.
+    progress = 1;
+
+    // Статус под кошкой.
+    StatusText = 'Перевод готов';
+
+    // Показываем найденное настроение.
+    detectedMood = mood;
+
+    // Показываем найденный тон.
+    detectedTone = tone;
+
+    // Показываем найденную громкость.
+    detectedVolume = volume;
+
+    // Уверенность будет от 82 до 98.
+    // random.nextInt(17) дает число от 0 до 16.
+    // 82 + это число = 82...98.
+    confidence = 82 + random.nextInt(17);
+
+    // Показываем финальный перевод.
+    Translate = finalTranslation;
+  });
+}
     @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -253,6 +327,73 @@ double progress = 0;
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+// InfoBox - наш собственный виджет.
+// Он нужен, чтобы не писать четыре одинаковые карточки вручную.
+class InfoBox extends StatelessWidget {
+  // Конструктор InfoBox.
+  // Чтобы создать карточку, нужно передать title и value.
+  const InfoBox({
+    super.key,
+
+    // required значит: это обязательный параметр.
+    // Без title карточку создать нельзя.
+    required this.title,
+
+    // value тоже обязателен.
+    required this.value,
+  });
+
+  // title - маленький заголовок карточки.
+  // Например: "Настроение".
+  final String title;
+
+  // value - главное значение карточки.
+  // Например: "голодная".
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    // Возвращаем белую карточку.
+    return Container(
+      // Внутренние отступы карточки.
+      padding: const EdgeInsets.all(14),
+
+      // Внешний вид карточки.
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+
+      // Внутри карточки два текста сверху вниз.
+      child: Column(
+        // Прижимаем тексты к левому краю.
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Маленький серый заголовок.
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Colors.black54,
+            ),
+          ),
+
+          // Отступ между заголовком и значением.
+          const SizedBox(height: 6),
+
+          // Главное значение карточки.
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
