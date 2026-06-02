@@ -293,6 +293,42 @@ void finishAnalysis() {
                   ),
                 ),
                 const SizedBox(height: 18),
+                Row(
+                children:[
+                  Expanded(
+                  child:InfoBox(
+                  title:'настроение',
+                    value:detectedMood
+                  ),
+                  ),
+                  const SizedBox(width: 18),
+                  Expanded(
+                  child:InfoBox(
+                  title:'громкость',
+                    value:detectedVolume
+                  ),
+                  ),
+                ],
+                ),
+                                const SizedBox(height: 18),
+                Row(
+                children:[
+                  Expanded(
+                  child:InfoBox(
+                  title:'тон',
+                    value:detectedTone
+                  ),
+                  ),
+                  const SizedBox(width: 18),
+                  Expanded(
+                  child:InfoBox(
+                  title:'уверенность',
+                    value: '$confidence%',
+                  ),
+                  ),
+                ],
+                ),
+                const SizedBox(height: 18),
                 Container(
                   width: double.infinity,
                   constraints: const BoxConstraints(minHeight: 150),
