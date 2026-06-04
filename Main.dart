@@ -43,7 +43,7 @@ String detectedTone = 'неизвестно';
 // detectedVolume - громкость звука.
 // Например: тихий, обычный, громкий.
 String detectedVolume = 'неизвестно';
-
+ List<String>history = [];
 // confidence - уверенность "ИИ" в процентах.
 // int значит целое число.
 int confidence = 0;
@@ -141,7 +141,7 @@ void finishAnalysis() {
   // Выбираем один случайный перевод из подходящего списка.
   final String finalTranslation =
       possibleTranslations[random.nextInt(possibleTranslations.length)];
-
+ String historyItem = '$finalTranslation $mood';
   // Обновляем экран финальными результатами анализа.
   setState(() {
     // Анализ больше не идет.
@@ -149,7 +149,7 @@ void finishAnalysis() {
 
     // Прогресс полный.
     progress = 1;
-
+history.insert(0,historyItem);
     // Статус под кошкой.
     StatusText = 'Перевод готов';
 
@@ -356,6 +356,18 @@ void finishAnalysis() {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                       OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HistoryPage(history: history),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.history),
+                    label: const Text('История'),
+                  ),
                     ],
                   ),
                 ),
@@ -431,6 +443,39 @@ class InfoBox extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+class HistoryPage extends StatelessWidget{
+  
+  final List< String > history;
+  const HistoryPage({
+    super.key,
+    required this.history,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('История прогнозов 📜'),
+      ),
+      body: history.isEmpty
+          ? const Center(
+              child: Text(
+                'История пока пустая',
+                style: TextStyle(fontSize: 22),
+              ),
+            )
+          : ListView.builder(
+              itemCount: history.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  leading: const Icon(Icons.star),
+                  title: Text(history[index]),
+                );
+              },
+            ),
     );
   }
 }
