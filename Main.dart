@@ -4,21 +4,65 @@ import 'dart:math';
 void main() {
   runApp(const CatTranslatorApp());
 }
-
-class CatTranslatorApp extends StatelessWidget {
+class User {
+  final String login;
+  final String password;
+//первый и последний раз = final
+  //String - наша строка
+//конструктор пользователя
+  User({
+    required this.login,
+    required this.password,
+    //required - обязательность заполнения
+  });
+}
+class CatTranslatorApp extends StatefulWidget {
   const CatTranslatorApp({super.key});
+
+  @override
+ 
+State<CatTranslatorApp> createState() => _CatTranslatorAppState();
+}
+
+class _CatTranslatorAppState extends State<CatTranslatorApp> {
+  final List<User> users = [];
+  User? currentUser;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const CatTranslatorScreen(),
+      home: currentUser == null
+          ? LoginPage(
+              users: users,
+              onLogin: (user) {
+                setState(() {
+                  currentUser = user;
+                });
+              },
+            )
+          : CatTranslatorScreen(
+              user: currentUser!,
+              onLogout: () {
+                setState(() {
+                  currentUser = null;
+                });
+              },
+            ),
     );
   }
 }
 
 class CatTranslatorScreen extends StatefulWidget {
-  const CatTranslatorScreen({super.key});
+  final User user;
+  final VoidCallback onLogout;
+
+  const CatTranslatorScreen({
+    super.key,
+    required this.user,
+    required this.onLogout,
+  });
+  
 @override
   State<CatTranslatorScreen> createState()=>_CatTranslatorScreen();}
 class _CatTranslatorScreen extends State<CatTranslatorScreen>
@@ -141,7 +185,7 @@ void finishAnalysis() {
   // Выбираем один случайный перевод из подходящего списка.
   final String finalTranslation =
       possibleTranslations[random.nextInt(possibleTranslations.length)];
- String historyItem = '$finalTranslation $mood';
+ String historyItem = 'перевод - $finalTranslation Настроение☺️ - $mood громкость - $volume тон - $tone';
   // Обновляем экран финальными результатами анализа.
   setState(() {
     // Анализ больше не идет.
@@ -458,7 +502,7 @@ class HistoryPage extends StatelessWidget{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('История прогнозов 📜'),
+        title: const Text('История переводов 📜'),
       ),
       body: history.isEmpty
           ? const Center(
