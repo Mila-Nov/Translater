@@ -16,6 +16,310 @@ class User {
     //required - обязательность заполнения
   });
 }
+class LoginPage extends StatefulWidget {
+  final List<User> users;
+  final Function(User) onLogin;
+//принимает пользователя когда успешный вход - Function(User)
+  const LoginPage({
+    super.key,
+    required this.users,
+    required this.onLogin,
+  });
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+class _LoginPageState extends State<LoginPage> {
+  /*
+  ========================================
+  КОНТРОЛЛЕРЫ ДЛЯ ПОЛЕЙ ВВОДА считывает что ввёл пользователь
+  ========================================
+  */
+
+  final TextEditingController loginController =
+      TextEditingController();
+
+  final TextEditingController passwordController =
+      TextEditingController();
+//переменная для текста ошибки
+  String errorText = '';
+
+  void login() {
+    //берут текст из полей
+    final login = loginController.text;
+    final password = passwordController.text;
+
+    /*
+    ========================================
+    ПРОВЕРКА ПОЛЬЗОВАТЕЛЕЙ
+    ========================================
+    */
+
+    for (var user in widget.users) {
+      if (//проверка на совпадение
+        user.login == login &&
+        user.password == password
+      ) {
+        widget.onLogin(user);
+        return;
+        //остановка поиска
+      }
+    }
+
+    setState(() {
+      errorText = 'Неверный логин или пароль';
+    });
+  }
+
+  void openRegisterPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RegisterPage(
+          users: widget.users,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.deepPurple.shade50,
+
+      appBar: AppBar(
+        title: const Text('Вход'),
+      ),
+
+      body: Center(
+        child: Card(
+          margin: const EdgeInsets.all(24),
+
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+
+              children: [
+                const Text(
+                  'Авторизация',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                /*
+                ========================================
+                ПОЛЕ ЛОГИНА
+                ========================================
+                */
+
+                TextField(
+                  controller: loginController,
+                  decoration: const InputDecoration(
+                    labelText: 'Логин',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                /*
+                ========================================
+                ПОЛЕ ПАРОЛЯ
+                ========================================
+                */
+
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+
+                  decoration: const InputDecoration(
+                    labelText: 'Пароль',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                Text(
+                  errorText,
+                  style: const TextStyle(
+                    color: Colors.red,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                /*
+                ========================================
+                КНОПКА ВХОДА
+                ========================================
+                */
+
+                ElevatedButton(
+                  onPressed: login,
+                  child: const Text('Войти'),
+                ),
+
+                const SizedBox(height: 12),
+
+                /*
+                ========================================
+                КНОПКА РЕГИСТРАЦИИ
+                ========================================
+                */
+
+                OutlinedButton(
+                  onPressed: openRegisterPage,
+                  child: const Text('Регистрация'),
+                ),
+              ],
+),
+          ),
+        ),
+      ),
+    );
+  }
+}
+class RegisterPage extends StatefulWidget {
+  final List<User> users;
+
+  const RegisterPage({
+    super.key,
+    required this.users,
+  });
+
+  @override
+  State<RegisterPage> createState() =>
+      _RegisterPageState();
+}
+
+class _RegisterPageState
+    extends State<RegisterPage> {
+
+  final TextEditingController loginController =
+      TextEditingController();
+
+  final TextEditingController passwordController =
+      TextEditingController();
+
+  String infoText = '';
+
+  void register() {
+    final login = loginController.text;
+    final password = passwordController.text;
+
+    /*
+    ========================================
+    ПРОВЕРКА НА ПУСТЫЕ ПОЛЯ при помощи is empty
+    ========================================
+    */
+
+    if (login.isEmpty || password.isEmpty) {
+      setState(() {
+        infoText = 'Заполните поля';
+      });
+
+      return;
+    }
+
+    /*
+    ========================================
+    СОЗДАЕМ НОВОГО ПОЛЬЗОВАТЕЛЯ
+    ========================================
+    */
+
+    widget.users.add(
+      User(
+        login: login,
+        password: password,
+      ),
+    );
+
+    setState(() {
+      infoText = 'Пользователь создан';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.deepPurple.shade50,
+
+      appBar: AppBar(
+        title: const Text('Регистрация'),
+      ),
+
+      body: Center(
+        child: Card(
+          margin: const EdgeInsets.all(24),
+
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+
+              children: [
+                const Text(
+                  'Регистрация',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                TextField(
+                  controller: loginController,
+
+                  decoration: const InputDecoration(
+                    labelText: 'Логин',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+
+                  decoration: const InputDecoration(
+                    labelText: 'Пароль',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                Text(
+                  infoText,
+                  style: const TextStyle(
+                    color: Colors.green,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                ElevatedButton(
+                  onPressed: register,
+                  child: const Text('Создать аккаунт'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 class CatTranslatorApp extends StatefulWidget {
   const CatTranslatorApp({super.key});
 
@@ -219,6 +523,12 @@ history.insert(0,historyItem);
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F3EA),
+      appBar: AppBar(title:  Text('Привет ${widget.user.login} это твой Переводчик 🔮'),actions: [
+          IconButton(
+            onPressed: widget.onLogout,
+            icon: const Icon(Icons.logout),
+          ),
+        ], ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
