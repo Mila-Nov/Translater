@@ -7,12 +7,20 @@ void main() {
 class User {
   final String login;
   final String password;
-//первый и последний раз = final
+  final String name;
+  final String petName;
+  final int age;
+  int countTranslate;
+//первый и последний раз= final
   //String - наша строка
 //конструктор пользователя
   User({
     required this.login,
     required this.password,
+    required this.name,
+    required this.petName,
+    required this.age,
+    this.countTranslate = 0,
     //required - обязательность заполнения
   });
 }
@@ -207,27 +215,40 @@ class _RegisterPageState
 
   final TextEditingController passwordController =
       TextEditingController();
-
+  final TextEditingController nameController =
+      TextEditingController();
+final TextEditingController petNameController =
+      TextEditingController();
+  final TextEditingController ageController =
+      TextEditingController();
   String infoText = '';
 
   void register() {
     final login = loginController.text;
     final password = passwordController.text;
-
+    final name = nameController.text;
+    final petName = petNameController.text;
+    final int? age = int.tryParse(ageController.text);
     /*
     ========================================
     ПРОВЕРКА НА ПУСТЫЕ ПОЛЯ при помощи is empty
     ========================================
     */
 
-    if (login.isEmpty || password.isEmpty) {
+    if (name.isEmpty ||petName.isEmpty ||login.isEmpty || password.isEmpty) {
       setState(() {
         infoText = 'Заполните поля';
       });
 
       return;
     }
+if(age == null){
+  setState(() {
+        infoText = 'Заполните поля';
+      });
 
+      return;
+}
     /*
     ========================================
     СОЗДАЕМ НОВОГО ПОЛЬЗОВАТЕЛЯ
@@ -238,6 +259,9 @@ class _RegisterPageState
       User(
         login: login,
         password: password,
+        name: name,
+        petName: petName,
+        age: age,
       ),
     );
 
@@ -273,18 +297,46 @@ class _RegisterPageState
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                const SizedBox(height: 20),
 
+                TextField(
+                  controller: nameController,
+
+                  decoration: const InputDecoration(
+                    labelText: 'имя',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                TextField(
+                  controller: petNameController,
+
+                  decoration: const InputDecoration(
+                    labelText: 'имя питомца',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+const SizedBox(height: 20),
+
+                TextField(
+                  controller: ageController,
+
+                  decoration: const InputDecoration(
+                    labelText: 'возраст',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
                 const SizedBox(height: 20),
 
                 TextField(
                   controller: loginController,
 
                   decoration: const InputDecoration(
-                    labelText: 'Логин',
+                    labelText: 'логин',
                     border: OutlineInputBorder(),
                   ),
                 ),
-
                 const SizedBox(height: 12),
 
                 TextField(
