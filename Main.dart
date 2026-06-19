@@ -280,6 +280,7 @@ if(age == null){
       ),
 
       body: Center(
+        child: SingleChildScrollView (
         child: Card(
           margin: const EdgeInsets.all(24),
 
@@ -369,7 +370,8 @@ const SizedBox(height: 20),
           ),
         ),
       ),
-    );
+    )
+      );
   }
 }
 class CatTranslatorApp extends StatefulWidget {
@@ -612,6 +614,12 @@ history.insert(0,historyItem);
         ]
       )
     );}
+  void editAccount(){
+  showDialog(
+  context:context,
+    
+  )  
+  }
 Widget personpage(){
   return ListView(
       padding: const EdgeInsets.all(20),
@@ -641,10 +649,25 @@ const SizedBox(height: 16),
          Card(
         child:
           ListTile(
+          leading:const Icon(Icons.person),
+            title:const Text('name'),
+            subtitle:Text(widget.user.name)
+          ),
+        ),
+         Card(
+        child:
+          ListTile(
           leading:const Icon(Icons.translate),
             title:const Text('количество переводов'),
             subtitle:Text('${widget.user.countTranslate} раз')
-            
+          ),
+        ),
+         Card(
+        child:
+          ListTile(
+          leading:const Icon(Icons.translate),
+            title:const Text('возраст'),
+            subtitle:Text('${widget.user.age} год')
           ),
         ),
         Card(
@@ -659,7 +682,7 @@ const SizedBox(height: 16),
     );
 }
   Widget historypage(){
-    body: history.isEmpty
+    return history.isEmpty
           ? const Center(
               child: Text(
                 'История пока пустая',
@@ -674,9 +697,7 @@ const SizedBox(height: 16),
                   title: Text(history[index]),
                 );
               },
-            ),
     );
-  }
 }
   Widget homepage(){
       return SafeArea(
@@ -792,7 +813,7 @@ const SizedBox(height: 16),
                   width: double.infinity,
                   height: 54,
                   child: ElevatedButton(
-                    onPressed: startRecording,
+                    onPressed:isAnalyzing?null: startRecording,
                     child: const Text('Записать мяу'),
                   ),
                 ),
@@ -879,7 +900,6 @@ const SizedBox(height: 16),
             ),
           ),
         ),
-      ),
     );
   }
 }
