@@ -615,10 +615,29 @@ history.insert(0,historyItem);
       )
     );}
   void editAccount(){
-  showDialog(
-  context:context,
+  final petNameController = TextEditingController(text:widget.user.petName);
+    final loginController = TextEditingController(text:widget.user.login);
     
-  )  
+    showDialog(
+  context:context,
+    builder: (context){
+      return AlertDialog(
+      title: Text('redact'),
+        content: Column(
+        children:[
+          TextField(
+          controller: petNameController,
+            decoration: InputDecoration(labelText:'name')
+          ),
+           TextField(
+          controller: loginController,
+            decoration: InputDecoration(labelText:'login')
+          )
+        ]
+        )
+      );
+    }
+  );  
   }
 Widget personpage(){
   return ListView(
