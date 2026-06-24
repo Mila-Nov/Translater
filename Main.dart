@@ -617,7 +617,7 @@ history.insert(0,historyItem);
   void editAccount(){
   final petNameController = TextEditingController(text:widget.user.petName);
     final loginController = TextEditingController(text:widget.user.login);
-    
+    final nameController = TextEditingController(text:widget.user.name);
     showDialog(
   context:context,
     builder: (context){
@@ -627,6 +627,10 @@ history.insert(0,historyItem);
         children:[
           TextField(
           controller: petNameController,
+            decoration: InputDecoration(labelText:'pet Name')
+          ),
+          TextField(
+          controller: nameController,
             decoration: InputDecoration(labelText:'name')
           ),
            TextField(
@@ -634,7 +638,26 @@ history.insert(0,historyItem);
             decoration: InputDecoration(labelText:'login')
           )
         ]
-        )
+        ),
+        actions:[
+          TextButton(
+          onPressed:(){
+            Navigator.pop(context);
+          },
+            
+            child:Text('отмена')
+          ),
+          ElevatedButton(
+           onPressed:(){
+             setState((){
+               widget.user.login = loginController.text;
+               widget.user.name = nameController.text;
+               widget.user.petName = petNameController.text;
+             });
+             Navigator.pop(context);
+           }
+          )
+        ]
       );
     }
   );  
