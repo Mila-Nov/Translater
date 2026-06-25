@@ -5,12 +5,13 @@ void main() {
   runApp(const CatTranslatorApp());
 }
 class User {
-  final String login;
-  final String password;
-  final String name;
-  final String petName;
-  final int age;
+   String login;
+   String password;
+   String name;
+   String petName;
+   int age;
   int countTranslate;
+  List<String> history;
 //первый и последний раз= final
   //String - наша строка
 //конструктор пользователя
@@ -21,8 +22,9 @@ class User {
     required this.petName,
     required this.age,
     this.countTranslate = 0,
+     List<String>? history,
     //required - обязательность заполнения
-  });
+  }):history = history??[];
 }
 class LoginPage extends StatefulWidget {
   final List<User> users;
@@ -445,7 +447,7 @@ String detectedTone = 'неизвестно';
 // detectedVolume - громкость звука.
 // Например: тихий, обычный, громкий.
 String detectedVolume = 'неизвестно';
- List<String>history = [];
+ 
 // confidence - уверенность "ИИ" в процентах.
 // int значит целое число.
 int confidence = 0;
@@ -551,7 +553,7 @@ void finishAnalysis() {
 
     // Прогресс полный.
     progress = 1;
-history.insert(0,historyItem);
+widget.user.history.insert(0,historyItem);
     // Статус под кошкой.
     StatusText = 'Перевод готов'; 
     widget.user.countTranslate++;
@@ -655,7 +657,8 @@ history.insert(0,historyItem);
                widget.user.petName = petNameController.text;
              });
              Navigator.pop(context);
-           }
+           },
+            child:Text('сохранить')
           )
         ]
       );
@@ -724,7 +727,7 @@ const SizedBox(height: 16),
     );
 }
   Widget historypage(){
-    return history.isEmpty
+    return widget.user.history.isEmpty
           ? const Center(
               child: Text(
                 'История пока пустая',
@@ -732,11 +735,11 @@ const SizedBox(height: 16),
               ),
             )
           : ListView.builder(
-              itemCount: history.length,
+              itemCount: widget.user.history.length,
               itemBuilder: (context, index) {
                 return ListTile(
                   leading: const Icon(Icons.star),
-                  title: Text(history[index]),
+                  title: Text(widget.user.history[index]),
                 );
               },
     );
@@ -928,7 +931,7 @@ const SizedBox(height: 16),
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => HistoryPage(history: history),
+                          builder: (context) => HistoryPage(history: widget.user.history),
                         ),
                       );
                     },
